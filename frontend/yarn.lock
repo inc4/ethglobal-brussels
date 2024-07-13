@@ -766,7 +766,7 @@
     "@react-types/datepicker" "3.7.4"
     "@react-types/shared" "3.23.1"
 
-"@nextui-org/date-picker@2.1.2":
+"@nextui-org/date-picker@2.1.2", "@nextui-org/date-picker@^2.1.2":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@nextui-org/date-picker/-/date-picker-2.1.2.tgz#f4fa1f42764efbfd073dbe630e26e9418340fcf7"
   integrity sha512-gNqhyA85SDtGNdr2CUBJ5FSy/wCtj2AKJGs2yEvKtA9A66khOH2H0tdfGALOWoAQdxGgOvP7c+9U5Oadogoygg==
@@ -833,7 +833,7 @@
     "@nextui-org/shared-utils" "2.0.5"
     "@nextui-org/use-image" "2.0.5"
 
-"@nextui-org/input@2.2.2":
+"@nextui-org/input@2.2.2", "@nextui-org/input@^2.2.2":
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/@nextui-org/input/-/input-2.2.2.tgz#db5d4bac963a9e5f53403254570ddbefd262a0c9"
   integrity sha512-mCcFsObJdlCWMuSutKTRniFIDX5+z4BAAtt/XI1uzOtUO6WXgT97BwVzMihC1l14WQsw9TCwFKAl8JWdolkNCA==
