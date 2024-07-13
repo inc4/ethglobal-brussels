@@ -1,7 +1,6 @@
 'use client'
 
 import {createPublicClient, http} from "viem";
-import {checkEnvVar} from "./utils";
 
 // export const pimlicoApiKey = checkEnvVar("NEXT_PUBLIC_PIMLICO_API_KEY");
 // export const wingmanModuleAddress = checkEnvVar("NEXT_PUBLIC_WINGMAN_MODULE_ADDRESS");

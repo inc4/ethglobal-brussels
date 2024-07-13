@@ -7,7 +7,6 @@ import {prepareSafeAccount, prepareSmartAccountClient} from "@/services/prepareS
 import {isWingmanModuleInitialized} from "@/services/installModule";
 import {walletClientToSmartAccountSigner} from "permissionless";
 
-
 export default function useSmartAccountClient() {
 	const [client, setClient] = useState({
 		smartAccountClient: null,

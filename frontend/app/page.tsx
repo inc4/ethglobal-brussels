@@ -9,17 +9,21 @@ import ConnectSafeButton from '@/components/ConnectSafeButton';
 import useUniversalAccountInfo from "@/hooks/useUniversalAccountInfo";
 import useSmartAccountClient from "@/hooks/useSmartAccountClient";
 import {Button} from "@nextui-org/button";
+import {installWingmanModule} from "@/services/installModule.js";
 
 export default function Home() {
   const { connectedTo } = useUniversalAccountInfo();
 
   const {
     isModuleSupported,
-    isWingmanDeployed
+    isWingmanDeployed,
+    smartAccountClient
   } = useSmartAccountClient();
 
   async function handleModuleDeploy() {
-
+    if (!smartAccountClient) return;
+    console.log(installWingmanModule)
+    installWingmanModule(smartAccountClient).then(() => console.log('Module installed'));
   }
 
   return (
@@ -35,7 +39,7 @@ export default function Home() {
           assets and support your loved ones if things don&apos;t go as planned.
         </p>
 
-        { !!connectedTo ? (
+        { !connectedTo ? (
           <ConnectSafeButton />
         ) : null }
 
@@ -53,7 +57,7 @@ export default function Home() {
               className="font-semibold"
               color="primary"
               size="lg"
-              // onClick={() => open({ view: 'Connect' })}
+              onClick={handleModuleDeploy}
             >
               Deploy Wingman module to your wallet
             </Button>
