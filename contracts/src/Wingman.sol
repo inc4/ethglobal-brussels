@@ -5,13 +5,21 @@ import { ERC7579ValidatorBase } from "modulekit/Modules.sol";
 import { PackedUserOperation } from "modulekit/external/ERC4337.sol";
 
 contract Wingman is ERC7579ValidatorBase {
-    /*//////////////////////////////////////////////////////////////////////////
-                            CONSTANTS & STORAGE
-    //////////////////////////////////////////////////////////////////////////*/
+    mapping(address => string[]) public backupNames;
+    mapping(address => mapping(string => Backup)) public backups;
 
-    /*//////////////////////////////////////////////////////////////////////////
-                                     CONFIG
-    //////////////////////////////////////////////////////////////////////////*/
+    struct Backup {
+        uint48 createdAt;
+	uint48 initiatedAt;
+	uint48 expiresAt;
+	Beneficiary[] beneficiaries;
+    }
+
+    struct Beneficiary {
+	address account;
+	uint8 percentage;
+	uint256 amount;
+    }
 
     /**
      * Initialize the module with the given data
@@ -34,10 +42,6 @@ contract Wingman is ERC7579ValidatorBase {
      * @return true if the module is initialized, false otherwise
      */
     function isInitialized(address smartAccount) external view returns (bool) { }
-
-    /*//////////////////////////////////////////////////////////////////////////
-                                     MODULE LOGIC
-    //////////////////////////////////////////////////////////////////////////*/
 
     /**
      * Validates PackedUserOperation
@@ -88,13 +92,33 @@ contract Wingman is ERC7579ValidatorBase {
         return EIP1271_FAILED;
     }
 
-    /*//////////////////////////////////////////////////////////////////////////
-                                     INTERNAL
-    //////////////////////////////////////////////////////////////////////////*/
+    function createBackup(
+	string memory name,
+	uint48 expiresAt
+    ) public {
+	Backup storage backup = backups[msg.sender][name];
+	backupNames[msg.sender].push(name);
+	backup.createdAt = uint48(block.timestamp);
+	backup.initiatedAt = uint48(block.timestamp);
+	backup.expiresAt = expiresAt;
+    }
 
-    /*//////////////////////////////////////////////////////////////////////////
-                                     METADATA
-    //////////////////////////////////////////////////////////////////////////*/
+    function addBeneficiary(
+	string calldata name,
+	address account,
+	uint8 percentage
+    ) public {
+	Backup storage backup = backups[msg.sender][name];
+	backup.beneficiaries.push(Beneficiary(account, percentage, 0));
+    }
+
+    function getBackups() public view returns (string[] memory) {
+	return backupNames[msg.sender];
+    }
+
+    function getBackup(string calldata name) public view returns (Backup memory) {
+	return backups[msg.sender][name];
+    }
 
     /**
      * The name of the module
