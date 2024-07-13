@@ -35,9 +35,8 @@ export const Navbar = () => {
     >
       <NavbarContent className="" justify="start">
         <NavbarBrand className="gap-3">
-          <NextLink className="flex justify-start items-center gap-1 " href="/">
+          <NextLink className="flex justify-start items-center" href="/">
             <Image alt="SAFE logo" src={logo} />
-            <p className="font-bold text-[28px]">Web3 Wingman</p>
           </NextLink>
         </NavbarBrand>
       </NavbarContent>
