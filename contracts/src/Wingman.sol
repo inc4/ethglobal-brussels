@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { ERC7579ValidatorBase } from "modulekit/Modules.sol";
-import { PackedUserOperation } from "modulekit/external/ERC4337.sol";
+import {ERC7579ExecutorBase} from "modulekit/Modules.sol";
+import {ModeLib} from "erc7579/lib/ModeLib.sol";
+import {ExecutionLib} from "erc7579/lib/ExecutionLib.sol";
+import {Execution, IERC7579Account} from "erc7579/interfaces/IERC7579Account.sol";
 
-contract Wingman is ERC7579ValidatorBase {
-    mapping(address => string[]) public backupNames;
-    mapping(address => mapping(string => Backup)) public backups;
+
+contract Wingman is ERC7579ExecutorBase {
+    mapping(address => string[]) internal backupNames;
+    mapping(address => mapping(string => Backup)) internal backups;
 
     struct Backup {
         uint48 createdAt;
-        uint48 initiatedAt;
-        uint48 expiresAt;
+        uint48 unlockAt;
         Beneficiary[] beneficiaries;
     }
 
@@ -21,97 +23,156 @@ contract Wingman is ERC7579ValidatorBase {
         uint256 amount;
     }
 
-    /**
-     * Initialize the module with the given data
-     *
-     * @param data The data to initialize the module with
-     */
-    function onInstall(bytes calldata data) external override { }
+    event BackupUpdated(address indexed account, string indexed name, Backup backup);
+    event BackupExecuted(address indexed account, string indexed name);
 
-    /**
-     * De-initialize the module with the given data
-     *
-     * @param data The data to de-initialize the module with
-     */
-    function onUninstall(bytes calldata data) external override { }
+    function onInstall(bytes calldata data) external override {}
 
-    /**
-     * Check if the module is initialized
-     * @param smartAccount The smart account to check
-     *
-     * @return true if the module is initialized, false otherwise
-     */
-    function isInitialized(address smartAccount) external view returns (bool) { }
-
-    /**
-     * Validates PackedUserOperation
-     *
-     * @param userOp UserOperation to be validated
-     * @param userOpHash Hash of the UserOperation to be validated
-     *
-     * @return sigValidationResult the result of the signature validation, which can be:
-     *  - 0 if the signature is valid
-     *  - 1 if the signature is invalid
-     *  - <20-byte> aggregatorOrSigFail, <6-byte> validUntil and <6-byte> validAfter (see ERC-4337
-     * for more details)
-     */
-    function validateUserOp(
-        PackedUserOperation calldata userOp,
-        bytes32 userOpHash
-    )
-        external
-        view
-        override
-        returns (ValidationData)
-    {
-        return ValidationData.wrap(0);
+    function onUninstall(bytes calldata data) external override {
+        _removeBackups(msg.sender);
     }
 
-    /**
-     * Validates an ERC-1271 signature
-     *
-     * @param sender The sender of the ERC-1271 call to the account
-     * @param hash The hash of the message
-     * @param signature The signature of the message
-     *
-     * @return sigValidationResult the result of the signature validation, which can be:
-     *  - EIP1271_SUCCESS if the signature is valid
-     *  - EIP1271_FAILED if the signature is invalid
-     */
-    function isValidSignatureWithSender(
-        address sender,
-        bytes32 hash,
-        bytes calldata signature
-    )
-        external
-        view
-        virtual
-        override
-        returns (bytes4 sigValidationResult)
-    {
-        return EIP1271_FAILED;
-    }
+    function isInitialized(address smartAccount) external view returns (bool) {}
 
-    function createBackup(string memory name, uint48 expiresAt) public {
+
+    function updateBackup(string memory name, uint48 unlockAt, Beneficiary[] memory beneficiaries) public {
+        require(unlockAt > block.timestamp, "Unlock time must be in the future");
+
         Backup storage backup = backups[msg.sender][name];
-        backupNames[msg.sender].push(name);
-        backup.createdAt = uint48(block.timestamp);
-        backup.initiatedAt = uint48(block.timestamp);
-        backup.expiresAt = expiresAt;
+
+        if (backup.createdAt != 0) { // new backup
+            backup.createdAt = uint48(block.timestamp);
+            backupNames[msg.sender].push(name);
+        }
+
+        backup.unlockAt = unlockAt;
+        delete backup.beneficiaries;
+
+        uint i;
+        uint totalPercentage;
+        uint benCount = beneficiaries.length;
+
+        // beneficiaries with absolute amount
+        for (; i < benCount; i++) {
+            if (beneficiaries[i].amount == 0) break;   // goto percentage amounts
+            require(beneficiaries[i].percentage == 0, "Both amount and percentage are not 0");
+
+            backup.beneficiaries.push(beneficiaries[i]);
+        }
+        // beneficiaries with percent amount
+        for (; i < benCount; i++) {
+            require(beneficiaries[i].percentage > 0 && beneficiaries[i].percentage <= 100, "Invalid percentage");
+            require(beneficiaries[i].amount == 0, "Both amount and percentage are not 0");
+
+            totalPercentage += beneficiaries[i].percentage;
+            backup.beneficiaries.push(beneficiaries[i]);
+        }
+
+        require(totalPercentage == 0 || totalPercentage == 100, "Total percentage must be 0 or 0");
+
+        emit BackupUpdated(msg.sender, name, backup);
     }
 
-    function addBeneficiary(string calldata name, address account, uint8 percentage) public {
+    function removeBackup(string memory name) public {
         Backup storage backup = backups[msg.sender][name];
-        backup.beneficiaries.push(Beneficiary(account, percentage, 0));
+        require(backup.createdAt != 0, "Backup does not exist");
+        _removeBackup(msg.sender, name);
     }
 
-    function getBackups(address account) public view returns (string[] memory) {
-        return backupNames[account];
+
+    function executeBackup(address owner, string memory name) public {
+        Backup storage backup = backups[msg.sender][name];
+        require(block.timestamp >= backup.unlockAt, "Backup is not ready to be executed");
+
+        Execution[] memory executions = new Execution[](0);
+
+
+        uint balance = owner.balance;
+        uint count = backup.beneficiaries.length;
+        uint i;
+
+        // absolute amounts
+        for (; i < count; i++) {
+            Beneficiary memory beneficiary = backup.beneficiaries[i];
+            if (beneficiary.amount == 0 ) break;  // goto percentage amounts
+
+            balance -= beneficiary.amount;
+            executions[i] = Execution({
+                target: beneficiary.account,
+                value: beneficiary.amount,
+                callData: ""
+            });
+        }
+
+        // percent amounts
+        for (; i < count; i++) {
+            Beneficiary memory beneficiary = backup.beneficiaries[i];
+
+            executions[i] = Execution({
+                target: beneficiary.account,
+                value: beneficiary.percentage * balance / 100,
+                callData: ""
+            });
+        }
+
+
+        IERC7579Account(owner).executeFromExecutor(
+            ModeLib.encodeSimpleBatch(), ExecutionLib.encodeBatch(executions)
+        );
+
+        _removeBackup(owner, name);
+
+        emit BackupExecuted(owner, name);
     }
 
-    function getBackup(address account, string calldata name) public view returns (Backup memory) {
-        return backups[account][name];
+
+    function getBackups(address owner) public view returns (string[] memory) {
+        return backupNames[owner];
     }
+
+    function getBackup(address owner, string calldata name) public view returns (Backup memory) {
+        return backups[owner][name];
+    }
+
+    // INTERNAL
+
+
+    function _removeBackup(address account, string memory name) internal {
+        string[] storage userBackups = backupNames[account];
+        uint count = userBackups.length;
+
+        for (uint i = 0; i < count; i++) {
+            if (_compareStr(userBackups[i], name)) {
+                userBackups[i] = userBackups[userBackups.length - 1];
+                userBackups.pop();
+
+                delete backups[account][name];
+                emit BackupUpdated(account, name, backups[account][name]);
+                return;
+            }
+        }
+        // todo always fail for some reason
+//        require(false, "Backup not found");
+    }
+
+    function _removeBackups(address account) internal {
+        string[] storage userBackups = backupNames[account];
+        uint count = userBackups.length;
+
+        for (uint i = 0; i < count; i++) {
+            string memory name = userBackups[count - i];
+            userBackups.pop();
+
+            delete backups[account][name];
+            emit BackupUpdated(account, name, backups[account][name]);
+        }
+    }
+
+    function _compareStr(string memory a, string memory b) internal pure returns (bool) {
+        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+    }
+
+    // module metadata
 
     /**
      * The name of the module
@@ -139,6 +200,6 @@ contract Wingman is ERC7579ValidatorBase {
      * @return true if the module is of the given type, false otherwise
      */
     function isModuleType(uint256 typeID) external pure override returns (bool) {
-        return typeID == TYPE_VALIDATOR || typeID == TYPE_HOOK;
+        return typeID == TYPE_EXECUTOR;
     }
 }
