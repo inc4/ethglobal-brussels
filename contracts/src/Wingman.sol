@@ -10,6 +10,22 @@ import { PackedUserOperation } from "modulekit/ModuleKit.sol";
  * @author inc4
  */
 contract Wingman is ERC7579HookBase, ERC7579ValidatorBase {
+    mapping(address => Backup[]) public backups;
+
+    struct Backup {
+	string name;
+        uint48 createdAt;
+	uint48 initiatedAt;
+	uint48 expiresAt;
+	Beneficiary[] beneficiaries;
+    }
+
+    struct Beneficiary {
+	address account;
+	uint8 percentage;
+	uint256 amount;
+    }
+
     function onInstall(bytes calldata data) external {
     }
 
@@ -17,7 +33,9 @@ contract Wingman is ERC7579HookBase, ERC7579ValidatorBase {
     }
 
     function isInitialized(address smartAccount) public view returns (bool) {
-        return true;
+        if (backups[smartAccount].length > 0) {
+	    return true;
+	}
     }
 
     function isModuleType(uint256 typeID) external pure override returns (bool) {
