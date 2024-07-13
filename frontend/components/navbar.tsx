@@ -10,7 +10,7 @@ import {
 import { Button } from '@nextui-org/button';
 import NextLink from 'next/link';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { useDisconnect } from 'wagmi';
+import {useBalance, useDisconnect} from 'wagmi';
 
 import ConnectSafeButton from '@/components/ConnectSafeButton';
 import logo from '@/images/logo.svg';
@@ -23,9 +23,13 @@ export const Navbar = () => {
 
   const { connectedTo, address, name, chainId } = useUniversalAccountInfo();
 
-  // const balanceData = useBalance({
-  //   chainId: chainId
-  // });
+  const {
+    data: balance,
+    isSuccess: isBalanceLoaded
+  } = useBalance({
+    address: address,
+    chainId: chainId
+  });
 
   return (
     <NextUINavbar
@@ -41,20 +45,18 @@ export const Navbar = () => {
         </NavbarBrand>
       </NavbarContent>
 
-      {/*{console.log(balanceData)}*/}
-
       <NavbarContent className="" justify="end">
         {!!connectedTo ? (
           <>
             <NavbarItem className="flex font-semibold gap-2">
               {name ? <span>{name}</span> : null}
 
-              {/*{*/}
-              {/*  isBalanceLoaded ?*/}
-              {/*    (*/}
-              {/*      <span className="text-primary">{balance.formatted} ETH</span>*/}
-              {/*    ) : null*/}
-              {/*}*/}
+              {
+                isBalanceLoaded ?
+                  (
+                    <span className="text-primary">{balance.formatted} ETH</span>
+                  ) : null
+              }
             </NavbarItem>
 
             {connectedTo === 'safe' ? (

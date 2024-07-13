@@ -1,3 +1,5 @@
+'use client';
+
 export function checkEnvVar(varName) {
 	const variable = process.env[varName];
 	if (!variable) {

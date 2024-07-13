@@ -15,13 +15,13 @@ export default function useUniversalAccountInfo(): UniversalAccountInfo {
       const connectedTo = isConnectedToSafe ? "safe" : isConnectedToWc ? "walletconnect" : undefined;
 
       if (isConnectedToSafe) {
-        console.log('connected to safe');
+        console.log({sdk, safe});
         const addressBook = await sdk.safe.requestAddressBook();
         const accountName = addressBook.find((account) => account.address === safe.safeAddress)?.name;
 
         setAccountInfo({
           connectedTo,
-          address: safe.safeAddress,
+          address: safe.safeAddress as `0x${string}`,
           chainId: safe.chainId,
           name: accountName,
         })
@@ -50,7 +50,7 @@ export default function useUniversalAccountInfo(): UniversalAccountInfo {
 
 interface UniversalAccountInfo {
   connectedTo: 'safe' | 'walletconnect' | undefined;
-  address?: string;
+  address?: `0x${string}`;
   chainId?: number;
   name?: string;
 }
