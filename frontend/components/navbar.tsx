@@ -10,8 +10,9 @@ import {
 import { Button } from '@nextui-org/button';
 import NextLink from 'next/link';
 
+import ConnectSafeButton from '@/components/ConnectSafeButton';
+
 import logo from '@/images/logo.svg';
-import logoSafe from '@/images/logo-safe.svg';
 import logout from '@/images/logout.svg';
 
 import { useWeb3Modal } from '@web3modal/wagmi/react';
@@ -37,17 +38,7 @@ export const Navbar = () => {
 
         <NavbarItem className="hidden md:flex">
           <div className="flex align-middle">
-            <Button
-              color="primary"
-              size="lg"
-              className="font-semibold"
-              // onClick={() => {
-              //   console.log('add connect safe');
-              // }}
-              startContent={<Image src={logoSafe} alt="SAFE logo" />}
-            >
-              Connect Safe
-            </Button>
+            <ConnectSafeButton />
             <Button
               color="default"
               variant="bordered"

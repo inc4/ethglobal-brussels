@@ -7,9 +7,14 @@ import keyImage from '@/images/key.png';
 import { Button } from '@nextui-org/button';
 
 import { useWeb3Modal } from '@web3modal/wagmi/react';
+import ConnectSafeButton from '@/components/ConnectSafeButton';
+
+import {useAccount, useConnect} from 'wagmi';
 
 export default function Home() {
   const { open } = useWeb3Modal();
+
+  const { isConnected, address, status } = useAccount();
 
   return (
     <section className="flex flex-nowrap align-middle">
@@ -24,17 +29,11 @@ export default function Home() {
           advantage of democracy on the Internet comes at a price.
         </p>
 
-        <div className="">
-          <Button
-            color="primary"
-            size="lg"
-            className="font-semibold"
-            onClick={() => open({ view: 'Connect' })}
-            startContent={<Image src={logoSafe} alt="SAFE logo" />}
-          >
-            Connect Safe
-          </Button>
-        </div>
+        <ConnectSafeButton />
+
+        isConnected: {isConnected ? 'true' : 'false'} <br />
+        address: {address} <br />
+        status: {status} <br />
       </div>
       <div className="flex align-middle justify-center w-full ">
         <Image src={keyImage} alt="key image" />

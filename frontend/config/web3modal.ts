@@ -1,6 +1,5 @@
-import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
-
 import { sepolia, arbitrum } from 'wagmi/chains'
+import {web3modalWagmiConfigWithSafe} from "@/web3modal-safe-apps/web3modalWagmiConfigWithSafe";
 
 // Your WalletConnect Cloud project ID
 export const projectId = '357b8852563f2b2429a8e515a8b0135d'
@@ -14,7 +13,7 @@ const metadata = {
 }
 
 const chains = [arbitrum, sepolia] as const
-export const wagmiConfig = defaultWagmiConfig({
+export const wagmiConfig = web3modalWagmiConfigWithSafe({
   chains,
   projectId,
   metadata,
