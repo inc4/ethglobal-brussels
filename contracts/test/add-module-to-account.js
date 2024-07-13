@@ -8,13 +8,6 @@ const timeout = 123123123;
 const beneficiary = privateKeyToAccount(beneficiaryPK);
 
 async function installModule({smartClient, beneficiaryAddress, timeout, moduleType, hook, account, bundlerClient, moduleAddress, publicClient}) {
-    const isInitialized = (await publicClient.readContract({
-        address: moduleAddress,
-        abi,
-        functionName: 'isInitialized',
-        args: [account.address],
-    }))
-
     const module = {
         module: moduleAddress,
         initData: '0x',
@@ -43,7 +36,7 @@ installModule({
     smartClient: smartAccountClient,
     beneficiaryAddress: beneficiary.address,
     timeout,
-    moduleType: "validator", //todo: executor
+    moduleType: "executor",
     hook: '0x',
     account: safeAccount,
     bundlerClient: pimlicoBundlerClient,
