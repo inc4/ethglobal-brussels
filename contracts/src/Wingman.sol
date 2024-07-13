@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import {ERC7579ExecutorBase} from "modulekit/Modules.sol";
-import {ModeLib} from "erc7579/lib/ModeLib.sol";
-import {ExecutionLib} from "erc7579/lib/ExecutionLib.sol";
-import {Execution, IERC7579Account} from "erc7579/interfaces/IERC7579Account.sol";
-
+import { ERC7579ExecutorBase } from "modulekit/Modules.sol";
+import { ModeLib } from "erc7579/lib/ModeLib.sol";
+import { ExecutionLib } from "erc7579/lib/ExecutionLib.sol";
+import { Execution, IERC7579Account } from "erc7579/interfaces/IERC7579Account.sol";
 
 contract Wingman is ERC7579ExecutorBase {
     mapping(address => string[]) internal backupNames;
@@ -26,21 +25,27 @@ contract Wingman is ERC7579ExecutorBase {
     event BackupUpdated(address indexed account, string indexed name, Backup backup);
     event BackupExecuted(address indexed account, string indexed name);
 
-    function onInstall(bytes calldata data) external override {}
+    function onInstall(bytes calldata data) external override { }
 
     function onUninstall(bytes calldata data) external override {
         _removeBackups(msg.sender);
     }
 
-    function isInitialized(address smartAccount) external view returns (bool) {}
+    function isInitialized(address smartAccount) external view returns (bool) { }
 
-
-    function updateBackup(string memory name, uint48 unlockAt, Beneficiary[] memory beneficiaries) public {
+    function updateBackup(
+        string memory name,
+        uint48 unlockAt,
+        Beneficiary[] memory beneficiaries
+    )
+        public
+    {
         require(unlockAt > block.timestamp, "Unlock time must be in the future");
 
         Backup storage backup = backups[msg.sender][name];
 
-        if (backup.createdAt == 0) { // new backup
+        if (backup.createdAt == 0) {
+            // new backup
             backup.createdAt = uint48(block.timestamp);
             backupNames[msg.sender].push(name);
         }
@@ -48,20 +53,23 @@ contract Wingman is ERC7579ExecutorBase {
         backup.unlockAt = unlockAt;
         delete backup.beneficiaries;
 
-        uint i;
-        uint totalPercentage;
-        uint benCount = beneficiaries.length;
+        uint256 i;
+        uint256 totalPercentage;
+        uint256 benCount = beneficiaries.length;
 
         // beneficiaries with absolute amount
         for (; i < benCount; i++) {
-            if (beneficiaries[i].amount == 0) break;   // goto percentage amounts
+            if (beneficiaries[i].amount == 0) break; // goto percentage amounts
             require(beneficiaries[i].percentage == 0, "Both amount and percentage are not 0");
 
             backup.beneficiaries.push(beneficiaries[i]);
         }
         // beneficiaries with percent amount
         for (; i < benCount; i++) {
-            require(beneficiaries[i].percentage > 0 && beneficiaries[i].percentage <= 100, "Invalid percentage");
+            require(
+                beneficiaries[i].percentage > 0 && beneficiaries[i].percentage <= 100,
+                "Invalid percentage"
+            );
             require(beneficiaries[i].amount == 0, "Both amount and percentage are not 0");
 
             totalPercentage += beneficiaries[i].percentage;
@@ -79,30 +87,25 @@ contract Wingman is ERC7579ExecutorBase {
         _removeBackup(msg.sender, name);
     }
 
-
     function executeBackup(address owner, string memory name) public {
         Backup storage backup = backups[owner][name];
         require(backup.createdAt != 0, "Backup does not exist");
         require(block.timestamp >= backup.unlockAt, "Backup is not ready to be executed");
 
-        uint balance = owner.balance;
-        uint count = backup.beneficiaries.length;
-        uint i;
+        uint256 balance = owner.balance;
+        uint256 count = backup.beneficiaries.length;
+        uint256 i;
 
         Execution[] memory executions = new Execution[](count);
-
 
         // absolute amounts
         for (; i < count; i++) {
             Beneficiary memory beneficiary = backup.beneficiaries[i];
-            if (beneficiary.amount == 0 ) break;  // goto percentage amounts
+            if (beneficiary.amount == 0) break; // goto percentage amounts
 
             balance -= beneficiary.amount;
-            executions[i] = Execution({
-                target: beneficiary.account,
-                value: beneficiary.amount,
-                callData: ""
-            });
+            executions[i] =
+                Execution({ target: beneficiary.account, value: beneficiary.amount, callData: "" });
         }
 
         // percent amounts
@@ -116,7 +119,6 @@ contract Wingman is ERC7579ExecutorBase {
             });
         }
 
-
         IERC7579Account(owner).executeFromExecutor(
             ModeLib.encodeSimpleBatch(), ExecutionLib.encodeBatch(executions)
         );
@@ -125,7 +127,6 @@ contract Wingman is ERC7579ExecutorBase {
 
         emit BackupExecuted(owner, name);
     }
-
 
     function getBackups(address owner) public view returns (string[] memory) {
         return backupNames[owner];
@@ -137,12 +138,11 @@ contract Wingman is ERC7579ExecutorBase {
 
     // INTERNAL
 
-
     function _removeBackup(address account, string memory name) internal {
         string[] storage userBackups = backupNames[account];
-        uint count = userBackups.length;
+        uint256 count = userBackups.length;
 
-        for (uint i = 0; i < count; i++) {
+        for (uint256 i = 0; i < count; i++) {
             if (_compareStr(userBackups[i], name)) {
                 userBackups[i] = userBackups[userBackups.length - 1];
                 userBackups.pop();
@@ -157,9 +157,9 @@ contract Wingman is ERC7579ExecutorBase {
 
     function _removeBackups(address account) internal {
         string[] storage userBackups = backupNames[account];
-        uint count = userBackups.length;
+        uint256 count = userBackups.length;
 
-        for (uint i = 0; i < count; i++) {
+        for (uint256 i = 0; i < count; i++) {
             string memory name = userBackups[count - i];
             userBackups.pop();
 
