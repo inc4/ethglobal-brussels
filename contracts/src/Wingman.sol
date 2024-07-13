@@ -40,7 +40,7 @@ contract Wingman is ERC7579ExecutorBase {
 
         Backup storage backup = backups[msg.sender][name];
 
-        if (backup.createdAt != 0) { // new backup
+        if (backup.createdAt == 0) { // new backup
             backup.createdAt = uint48(block.timestamp);
             backupNames[msg.sender].push(name);
         }
@@ -81,15 +81,16 @@ contract Wingman is ERC7579ExecutorBase {
 
 
     function executeBackup(address owner, string memory name) public {
-        Backup storage backup = backups[msg.sender][name];
+        Backup storage backup = backups[owner][name];
+        require(backup.createdAt != 0, "Backup does not exist");
         require(block.timestamp >= backup.unlockAt, "Backup is not ready to be executed");
-
-        Execution[] memory executions = new Execution[](0);
-
 
         uint balance = owner.balance;
         uint count = backup.beneficiaries.length;
         uint i;
+
+        Execution[] memory executions = new Execution[](count);
+
 
         // absolute amounts
         for (; i < count; i++) {
@@ -151,8 +152,7 @@ contract Wingman is ERC7579ExecutorBase {
                 return;
             }
         }
-        // todo always fail for some reason
-//        require(false, "Backup not found");
+        require(false, "Backup not found");
     }
 
     function _removeBackups(address account) internal {

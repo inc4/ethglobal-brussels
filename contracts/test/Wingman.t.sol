@@ -53,7 +53,7 @@ contract WingmanTest is RhinestoneModuleKit, Test {
         uint balanceBefore4 = address(0x4).balance;
 
 
-        vm.warp(1);
+        vm.warp(10000000);
 
         instance.getExecOps({
             target: address(wingman),
@@ -65,7 +65,7 @@ contract WingmanTest is RhinestoneModuleKit, Test {
         vm.deal(address(instance.account), 350);
         Wingman.Backup memory backup = wingman.getBackup(address(instance.account), "name1");
 
-        assertEq(backup.createdAt, 0);
+        assertEq(backup.createdAt, 10000000);
         assertEq(backup.unlockAt, 20000000);
         assertEq(backup.beneficiaries.length, 4);
         assertEq(backup.beneficiaries[0].account, address(0x1));
@@ -76,22 +76,23 @@ contract WingmanTest is RhinestoneModuleKit, Test {
         assertEq(backup.beneficiaries[1].percentage, 0);
 
 
-        console2.log(block.timestamp);
-        // TODO should revert but doesn't
-//        vm.expectRevert();
-//        wingman.executeBackup(address(instance.account), "name1");
-
+        vm.expectRevert();
+        wingman.executeBackup(address(instance.account), "name1");
+//
 
         vm.warp(20000000);
         wingman.executeBackup(address(instance.account), "name1");
 
 
-        // todo fails :(
         assertEq(address(0x1).balance, balanceBefore1 + 50);
         assertEq(address(0x2).balance, balanceBefore2 + 100);
         assertEq(address(0x3).balance, balanceBefore3 + 50);
         assertEq(address(0x4).balance, balanceBefore4 + 150);
 
+
+        // deleted
+        backup = wingman.getBackup(address(instance.account), "name1");
+        assertEq(backup.createdAt, 0);
 
     }
 }
