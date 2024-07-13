@@ -7,7 +7,7 @@ import { getTransport } from './getTransport';
 import { safe } from "wagmi/connectors"
 
 export function web3modalWagmiConfigWithSafe({ projectId, chains, metadata, enableCoinbase, enableInjected, auth = {}, enableWalletConnect, enableEIP6963, ...wagmiConfig }) {
-	const connectors = [safe()];
+	const connectors = [safe({ shimDisconnect: true, debug: true })];
 	const transportsArr = chains.map(chain => [chain.id, getTransport({ chain, projectId })]);
 	const transports = Object.fromEntries(transportsArr);
 	const defaultAuth = {

@@ -15,10 +15,24 @@ import ConnectSafeButton from '@/components/ConnectSafeButton';
 import logo from '@/images/logo.svg';
 import logout from '@/images/logout.svg';
 
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import useUniversalAccountInfo from "@/hooks/useUniversalAccountInfo";
+import {useBalance, useDisconnect} from "wagmi";
+import {arbitrum} from "wagmi/chains";
 
 export const Navbar = () => {
-  const { open } = useWeb3Modal();
+  const { disconnect } = useDisconnect();
+
+  const {
+    connectedTo,
+    address,
+    name,
+    chainId
+  } = useUniversalAccountInfo();
+
+  // const balanceData = useBalance({
+  //   chainId: chainId
+  // });
+
   return (
     <NextUINavbar maxWidth="xl" className=" py-14">
       <NavbarContent className="" justify="start">
@@ -30,29 +44,67 @@ export const Navbar = () => {
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className="" justify="end">
-        <NavbarItem className="flex font-semibold gap-2">
-          <span>UserName12</span>
-          <span className="text-primary">145 ETH</span>
-        </NavbarItem>
+      {/*{console.log(balanceData)}*/}
 
-        <NavbarItem className="hidden md:flex">
-          <div className="flex align-middle">
-            <ConnectSafeButton />
-            <Button
-              color="default"
-              variant="bordered"
-              size="lg"
-              className="font-semibold border-default-900"
-              // onClick={() => {
-              //   console.log('add connect safe');
-              // }}
-              endContent={<Image src={logout} alt="logout" />}
-            >
-              Ox8g...ghxv
-            </Button>
-          </div>
-        </NavbarItem>
+      <NavbarContent className="" justify="end">
+
+        {
+          !!connectedTo ? (
+          <>
+            <NavbarItem className="flex font-semibold gap-2">
+              {
+                name ?
+                  (
+                    <span>{name}</span>
+                  ) : null
+              }
+
+              {/*{*/}
+              {/*  isBalanceLoaded ?*/}
+              {/*    (*/}
+              {/*      <span className="text-primary">{balance.formatted} ETH</span>*/}
+              {/*    ) : null*/}
+              {/*}*/}
+            </NavbarItem>
+
+            {
+              connectedTo === 'safe' ?
+                (
+                  <Button
+                    color="default"
+                    variant="bordered"
+                    size="lg"
+                    className="font-semibold border-default-900"
+                  >
+                    {address && (`${address.slice(0, 4)}...${address.slice(-4)}`)}
+                  </Button>
+                )
+                : null
+            }
+            { connectedTo === 'walletconnect' ?
+                (
+                  <Button
+                    color="default"
+                    variant="bordered"
+                    size="lg"
+                    className="font-semibold border-default-900"
+                    onClick={() => disconnect()}
+                    endContent={<Image src={logout} alt="logout" />}
+                  >
+                    {address && (`${address.slice(0, 4)}...${address.slice(-4)}`)}
+                  </Button>
+                ) : null
+            }
+          </>
+        ) : (
+          <NavbarItem className="hidden md:flex">
+            <div className="flex align-middle">
+              <ConnectSafeButton />
+            </div>
+          </NavbarItem>
+        )
+      }
+
       </NavbarContent>
     </NextUINavbar>
   );
