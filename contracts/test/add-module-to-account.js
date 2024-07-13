@@ -47,7 +47,7 @@ installModule({
     hook: '0x',
     account: safeAccount,
     bundlerClient: pimlicoBundlerClient,
-    moduleAddress: "0x6A53E204b8A21dfD64516ff27484e6113640CB96",
+    moduleAddress: "0xbDa1dE70eAE1A18BbfdCaE95B42b5Ff6d3352492",
     publicClient
 });
 
