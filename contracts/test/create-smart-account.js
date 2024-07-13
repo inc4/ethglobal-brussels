@@ -52,7 +52,8 @@ export async function createSmartWallet({privateKey, bundlerUrl}) {
 }
 
 const { safeAccount } = await createSmartWallet({
-    privateKey: "0x30320097c1d7009d6d970376c792fe157a5e989f057b8908345043393a56a8a5",
-    bundlerUrl: "https://api.pimlico.io/v2/sepolia/rpc?apikey=04287e53-84d2-413b-bbc6-450629d7e999",
+    privateKey: process.env.PK,
+    bundlerUrl: "https://api.pimlico.io/v2/sepolia/rpc?apikey=" + process.env.PIMLICO_API_KEY,
 });
+console.log(safeAccount);
 console.log("Safe account address:", safeAccount.address);
