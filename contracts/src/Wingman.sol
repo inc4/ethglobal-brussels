@@ -10,15 +10,15 @@ contract Wingman is ERC7579ValidatorBase {
 
     struct Backup {
         uint48 createdAt;
-	uint48 initiatedAt;
-	uint48 expiresAt;
-	Beneficiary[] beneficiaries;
+        uint48 initiatedAt;
+        uint48 expiresAt;
+        Beneficiary[] beneficiaries;
     }
 
     struct Beneficiary {
-	address account;
-	uint8 percentage;
-	uint256 amount;
+        address account;
+        uint8 percentage;
+        uint256 amount;
     }
 
     /**
@@ -92,32 +92,25 @@ contract Wingman is ERC7579ValidatorBase {
         return EIP1271_FAILED;
     }
 
-    function createBackup(
-	string memory name,
-	uint48 expiresAt
-    ) public {
-	Backup storage backup = backups[msg.sender][name];
-	backupNames[msg.sender].push(name);
-	backup.createdAt = uint48(block.timestamp);
-	backup.initiatedAt = uint48(block.timestamp);
-	backup.expiresAt = expiresAt;
+    function createBackup(string memory name, uint48 expiresAt) public {
+        Backup storage backup = backups[msg.sender][name];
+        backupNames[msg.sender].push(name);
+        backup.createdAt = uint48(block.timestamp);
+        backup.initiatedAt = uint48(block.timestamp);
+        backup.expiresAt = expiresAt;
     }
 
-    function addBeneficiary(
-	string calldata name,
-	address account,
-	uint8 percentage
-    ) public {
-	Backup storage backup = backups[msg.sender][name];
-	backup.beneficiaries.push(Beneficiary(account, percentage, 0));
+    function addBeneficiary(string calldata name, address account, uint8 percentage) public {
+        Backup storage backup = backups[msg.sender][name];
+        backup.beneficiaries.push(Beneficiary(account, percentage, 0));
     }
 
-    function getBackups() public view returns (string[] memory) {
-	return backupNames[msg.sender];
+    function getBackups(address account) public view returns (string[] memory) {
+        return backupNames[account];
     }
 
-    function getBackup(string calldata name) public view returns (Backup memory) {
-	return backups[msg.sender][name];
+    function getBackup(address account, string calldata name) public view returns (Backup memory) {
+        return backups[account][name];
     }
 
     /**
