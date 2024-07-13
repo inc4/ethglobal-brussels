@@ -28,7 +28,8 @@
     "create:backup": "bun run ./test/create-backup.js"
   },
   "dependencies": {
-    "@rhinestone/modulekit": "^0.4.7"
+    "@rhinestone/modulekit": "^0.4.7",
+    "prettier": "^3.3.3"
   },
   "files": [
     "src",
