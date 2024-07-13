@@ -76,7 +76,7 @@ contract Wingman is ERC7579ExecutorBase {
             backup.beneficiaries.push(beneficiaries[i]);
         }
 
-        require(totalPercentage == 0 || totalPercentage == 100, "Total percentage must be 0 or 0");
+        require(totalPercentage == 0 || totalPercentage == 100, "Total percentage must be 0 or 100");
 
         emit BackupUpdated(msg.sender, name, backup);
     }
