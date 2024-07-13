@@ -1,60 +1,11 @@
-import {
-    ENTRYPOINT_ADDRESS_V07,
-    createSmartAccountClient,
-} from "permissionless";
-import { signerToSafeSmartAccount } from "permissionless/accounts";
-import {
-    createPimlicoBundlerClient,
-} from "permissionless/clients/pimlico";
-import { createPublicClient, http, encodePacked } from "viem";
-import { sepolia } from "viem/chains";
-import {generatePrivateKey, privateKeyToAccount} from "viem/accounts";
-import {erc7579Actions} from "permissionless/actions/erc7579.js";
-import {pimlicoPaymasterActions} from "permissionless/actions/pimlico";
-import {abi} from "./abi";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { abi } from "./abi";
+import { createSmartWallet } from "./create-smart-account";
 
-const apiKey = ""
+const beneficiaryPK = generatePrivateKey();
 
-const privateKey = generatePrivateKey()
-
-export const bundlerUrl = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${apiKey}`
-
-const signer = privateKeyToAccount(privateKey);
-
-
-const publicClient = createPublicClient({
-    transport: http("https://rpc.ankr.com/eth_sepolia"),
-})
-
-const pimlicoBundlerClient = createPimlicoBundlerClient({
-    transport: http(bundlerUrl),
-    entryPoint: ENTRYPOINT_ADDRESS_V07,
-}).extend(pimlicoPaymasterActions(ENTRYPOINT_ADDRESS_V07));
-
-const safeAccount = await signerToSafeSmartAccount(publicClient, {
-    signer,
-    safeVersion: "1.4.1",
-    entryPoint: ENTRYPOINT_ADDRESS_V07,
-    safe4337ModuleAddress: "0x3Fdb5BC686e861480ef99A6E3FaAe03c0b9F32e2",
-    erc7579LaunchpadAddress: "0xEBe001b3D534B9B6E2500FB78E67a1A137f561CE",
-})
-
-const smartAccountClient = createSmartAccountClient({
-    account: safeAccount,
-    entryPoint: ENTRYPOINT_ADDRESS_V07,
-    chain: sepolia,
-    bundlerTransport: http(bundlerUrl),
-    middleware: {
-        gasPrice: async () => {
-            return (await pimlicoBundlerClient.getUserOperationGasPrice()).fast
-        },
-        sponsorUserOperation: pimlicoBundlerClient.sponsorUserOperation
-
-    },
-}).extend(erc7579Actions({ entryPoint: ENTRYPOINT_ADDRESS_V07 }))
-
-const beneficiary = privateKeyToAccount(privateKey);
-const timeout = 100; //in seconds
+const timeout = 123123123;
+const beneficiary = privateKeyToAccount(beneficiaryPK);
 
 async function installModule({smartClient, beneficiaryAddress, timeout, moduleType, hook, account, bundlerClient, moduleAddress, publicClient}) {
     const isInitialized = (await publicClient.readContract({
@@ -66,9 +17,7 @@ async function installModule({smartClient, beneficiaryAddress, timeout, moduleTy
 
     const module = {
         module: moduleAddress,
-        initData: isInitialized
-            ? '0x'
-            : encodePacked(['address', 'uint48'], [beneficiaryAddress, timeout]),
+        initData: '0x',
         deInitData: '0x',
         additionalContext: '0x',
         type: moduleType,
@@ -85,14 +34,20 @@ async function installModule({smartClient, beneficiaryAddress, timeout, moduleTy
     const receipt = await bundlerClient.waitForUserOperationReceipt({ hash: opHash })
 }
 
+const { smartAccountClient, safeAccount, pimlicoBundlerClient, publicClient } = createSmartWallet({
+    privateKey: "<PK>",
+    bundlerUrl: "<bundlerUrl>"
+})
+
 installModule({
     smartClient: smartAccountClient,
     beneficiaryAddress: beneficiary.address,
     timeout,
-    moduleType: "validator",
+    moduleType: "validator", //todo: executor
     hook: '0x',
     account: safeAccount,
     bundlerClient: pimlicoBundlerClient,
     moduleAddress: "0x6A53E204b8A21dfD64516ff27484e6113640CB96",
     publicClient
-})
+});
+

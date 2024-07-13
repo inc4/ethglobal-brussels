@@ -23,7 +23,9 @@
     "test": "forge test",
     "test:lite": "FOUNDRY_PROFILE=lite forge test",
     "test:optimized": "pnpm run build:optimized && FOUNDRY_PROFILE=test-optimized forge test",
-    "add:module": "bun run ./test/add-module-to-account.js"
+    "create:account": "bun run ./test/create-smart-account.js",
+    "add:module": "bun run ./test/add-module-to-account.js",
+    "create:backup": "bun run ./test/create-backup.js"
   },
   "dependencies": {
     "@rhinestone/modulekit": "^0.4.7"
