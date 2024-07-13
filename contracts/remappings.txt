@@ -1,0 +1,14 @@
+ExcessivelySafeCall/=node_modules/excessively-safe-call/src/
+account-abstraction-v0.6/=node_modules/@ERC4337/account-abstraction-v0.6/contracts/
+account-abstraction/=node_modules/@ERC4337/account-abstraction/contracts/
+erc4337-validation/=node_modules/@rhinestone/erc4337-validation/src/
+erc7579/=node_modules/erc7579/src/
+forge-std/=node_modules/forge-std/src/
+kernel/=node_modules/@zerodev/kernel/src/
+module-bases/=node_modules/@rhinestone/module-bases/src/
+modulekit/=node_modules/@rhinestone/modulekit/src/
+safe7579/=node_modules/@rhinestone/safe7579/src/
+sentinellist/=node_modules/@rhinestone/sentinellist/src/
+solady/=node_modules/solady/src/
+solarray/=node_modules/solarray/src/
+@prb/math/=node_modules/@prb/math/src/

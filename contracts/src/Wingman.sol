@@ -24,6 +24,19 @@ contract Wingman is ERC7579HookBase, ERC7579ValidatorBase {
         return typeID == TYPE_HOOK || typeID == TYPE_VALIDATOR;
     }
 
+    function _postCheck(address account, bytes calldata hookData) internal override { }
+
+    function _preCheck(address account, address, uint256, bytes calldata) internal override returns (bytes memory hookData) {
+        return "";
+    }
+
+    function isValidSignatureWithSender(address, bytes32, bytes calldata) external pure override returns (bytes4) {
+        return "";
+    }
+
+    function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash) external override returns (ValidationData) {
+    }
+
     function name() external pure virtual returns (string memory) {
         return "Web3Wingman";
     }
