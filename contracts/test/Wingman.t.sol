@@ -10,29 +10,29 @@ import {
     UserOpData
 } from "modulekit/ModuleKit.sol";
 import { MODULE_TYPE_VALIDATOR } from "modulekit/external/ERC7579.sol";
-import { ValidatorTemplate } from "src/ValidatorTemplate.sol";
+import { Wingman } from "src/Wingman.sol";
 
-contract ValidatorTemplateTest is RhinestoneModuleKit, Test {
+contract WingmanTest is RhinestoneModuleKit, Test {
     using ModuleKitHelpers for *;
     using ModuleKitUserOp for *;
 
     // account and modules
     AccountInstance internal instance;
-    ValidatorTemplate internal validator;
+    Wingman internal wingman;
 
     function setUp() public {
         init();
 
-        // Create the validator
-        validator = new ValidatorTemplate();
-        vm.label(address(validator), "ValidatorTemplate");
+        // Create the wingman
+        wingman = new Wingman();
+        vm.label(address(wingman), "Wingman");
 
-        // Create the account and install the validator
-        instance = makeAccountInstance("ValidatorTemplate");
+        // Create the account and install the wingman
+        instance = makeAccountInstance("Wingman");
         vm.deal(address(instance.account), 10 ether);
         instance.installModule({
             moduleTypeId: MODULE_TYPE_VALIDATOR,
-            module: address(validator),
+            module: address(wingman),
             data: ""
         });
     }
@@ -50,7 +50,7 @@ contract ValidatorTemplateTest is RhinestoneModuleKit, Test {
             target: target,
             value: value,
             callData: "",
-            txValidator: address(validator)
+            txValidator: address(wingman)
         });
 
         // Set the signature
