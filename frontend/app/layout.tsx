@@ -36,19 +36,19 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          'min-h-screen bg-background font-sans antialiased',
+          'font-sans antialiased min-h-screen bg-gradient-to-b from-white to-[#EAF1FF]',
           fontSans.variable,
         )}
       >
         <Providers themeProps={{ attribute: 'class', defaultTheme: 'light' }}>
-          <div className="relative flex flex-col h-screen">
+          <div className="relative flex min-h-screen flex-col bg-transparent">
             <Navbar />
 
-            <main className="container mx-auto max-w-7xl px-6 flex-grow">
+            <main className="container mx-auto max-w-7xl px-6 flex-grow ">
               {children}
             </main>
-            <footer className="w-full flex items-center justify-center py-3">
-              <span className="text-default-600">
+            <footer className="w-full flex items-center justify-center pt-8">
+              <span className="text-default-600 pb-8">
                 © 2024. All rights reserved.
               </span>
             </footer>

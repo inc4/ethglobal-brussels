@@ -9,36 +9,34 @@ import {
 } from '@nextui-org/navbar';
 import { Button } from '@nextui-org/button';
 import NextLink from 'next/link';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useDisconnect } from 'wagmi';
 
 import ConnectSafeButton from '@/components/ConnectSafeButton';
-
 import logo from '@/images/logo.svg';
 import logout from '@/images/logout.svg';
-
-import useUniversalAccountInfo from "@/hooks/useUniversalAccountInfo";
-import {useBalance, useDisconnect} from "wagmi";
-import {arbitrum} from "wagmi/chains";
+import useUniversalAccountInfo from '@/hooks/useUniversalAccountInfo';
 
 export const Navbar = () => {
   const { disconnect } = useDisconnect();
+  const { open } = useWeb3Modal();
 
-  const {
-    connectedTo,
-    address,
-    name,
-    chainId
-  } = useUniversalAccountInfo();
+  const { connectedTo, address, name, chainId } = useUniversalAccountInfo();
 
   // const balanceData = useBalance({
   //   chainId: chainId
   // });
 
   return (
-    <NextUINavbar maxWidth="xl" className=" py-14">
+    <NextUINavbar
+      className="bg-transparent backdrop-filter-none py-14"
+      maxWidth="xl"
+      position="static"
+    >
       <NavbarContent className="" justify="start">
         <NavbarBrand className="gap-3">
           <NextLink className="flex justify-start items-center gap-1 " href="/">
-            <Image src={logo} alt="SAFE logo" />
+            <Image alt="SAFE logo" src={logo} />
             <p className="font-bold text-[28px]">Web3 Wingman</p>
           </NextLink>
         </NavbarBrand>
@@ -47,17 +45,10 @@ export const Navbar = () => {
       {/*{console.log(balanceData)}*/}
 
       <NavbarContent className="" justify="end">
-
-        {
-          !!connectedTo ? (
+        {!!connectedTo ? (
           <>
             <NavbarItem className="flex font-semibold gap-2">
-              {
-                name ?
-                  (
-                    <span>{name}</span>
-                  ) : null
-              }
+              {name ? <span>{name}</span> : null}
 
               {/*{*/}
               {/*  isBalanceLoaded ?*/}
@@ -67,34 +58,28 @@ export const Navbar = () => {
               {/*}*/}
             </NavbarItem>
 
-            {
-              connectedTo === 'safe' ?
-                (
-                  <Button
-                    color="default"
-                    variant="bordered"
-                    size="lg"
-                    className="font-semibold border-default-900"
-                  >
-                    {address && (`${address.slice(0, 4)}...${address.slice(-4)}`)}
-                  </Button>
-                )
-                : null
-            }
-            { connectedTo === 'walletconnect' ?
-                (
-                  <Button
-                    color="default"
-                    variant="bordered"
-                    size="lg"
-                    className="font-semibold border-default-900"
-                    onClick={() => disconnect()}
-                    endContent={<Image src={logout} alt="logout" />}
-                  >
-                    {address && (`${address.slice(0, 4)}...${address.slice(-4)}`)}
-                  </Button>
-                ) : null
-            }
+            {connectedTo === 'safe' ? (
+              <Button
+                className="font-semibold border-default-900"
+                color="default"
+                size="lg"
+                variant="bordered"
+              >
+                {address && `${address.slice(0, 4)}...${address.slice(-4)}`}
+              </Button>
+            ) : null}
+            {connectedTo === 'walletconnect' ? (
+              <Button
+                className="font-semibold border-default-900"
+                color="default"
+                endContent={<Image alt="logout" src={logout} />}
+                size="lg"
+                variant="bordered"
+                onClick={() => disconnect()}
+              >
+                {address && `${address.slice(0, 4)}...${address.slice(-4)}`}
+              </Button>
+            ) : null}
           </>
         ) : (
           <NavbarItem className="hidden md:flex">
@@ -102,9 +87,7 @@ export const Navbar = () => {
               <ConnectSafeButton />
             </div>
           </NavbarItem>
-        )
-      }
-
+        )}
       </NavbarContent>
     </NextUINavbar>
   );
