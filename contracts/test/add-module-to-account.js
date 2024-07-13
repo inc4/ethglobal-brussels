@@ -27,9 +27,9 @@ async function installModule({smartClient, beneficiaryAddress, timeout, moduleTy
     const receipt = await bundlerClient.waitForUserOperationReceipt({ hash: opHash })
 }
 
-const { smartAccountClient, safeAccount, pimlicoBundlerClient, publicClient } = createSmartWallet({
+const { smartAccountClient, safeAccount, pimlicoBundlerClient, publicClient } = await createSmartWallet({
     privateKey: "<PK>",
-    bundlerUrl: "<bundlerUrl>"
+    bundlerUrl: "https://api.pimlico.io/v2/sepolia/rpc?apikey=<API_KEY>"
 })
 
 installModule({
