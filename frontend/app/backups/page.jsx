@@ -34,7 +34,7 @@ import useUniversalAccountInfo from '@/hooks/useUniversalAccountInfo';
 // });
 
 // const moduleAddress = '0xbDa1dE70eAE1A18BbfdCaE95B42b5Ff6d3352492';
-const ownerAddress = '0xED9586AD3a6A512ce5c2d0C6a5bf8972c00137e2';
+// const ownerAddress = '0xED9586AD3a6A512ce5c2d0C6a5bf8972c00137e2';
 
 // const getBackupsAbi = [
 //   {
@@ -94,9 +94,8 @@ export default function BackUpsPage() {
 
   useEffect(() => {
     console.log('ADDRESS', address);
-    // ! delete !
-    if (!address) {
-      getBackups(ownerAddress)
+    if (address) {
+      getBackups(address)
         .then((backups) => {
           setBackupsList(backups);
           console.log('Backups:', backups);
