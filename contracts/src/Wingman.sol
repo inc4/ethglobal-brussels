@@ -7,6 +7,7 @@ import { ExecutionLib } from "erc7579/lib/ExecutionLib.sol";
 import { Execution, IERC7579Account } from "erc7579/interfaces/IERC7579Account.sol";
 
 contract Wingman is ERC7579ExecutorBase {
+    address[] public users;
     mapping(address => string[]) internal backupNames;
     mapping(address => mapping(string => Backup)) internal backups;
 
@@ -25,7 +26,9 @@ contract Wingman is ERC7579ExecutorBase {
     event BackupUpdated(address indexed account, string indexed name, Backup backup);
     event BackupExecuted(address indexed account, string indexed name);
 
-    function onInstall(bytes calldata data) external override { }
+    function onInstall(bytes calldata data) external override {
+	users.push(msg.sender);
+    }
 
     function onUninstall(bytes calldata data) external override {
         _removeBackups(msg.sender);
