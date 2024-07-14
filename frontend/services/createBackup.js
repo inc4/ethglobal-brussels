@@ -117,9 +117,14 @@ export async function createBackup(owner, smartAccountAddress, name, unlockAt, b
 
 	const gasPrice = await bundlerClient.getUserOperationGasPrice()
 
+	const nonce = await getAccountNonce(publicClient, {
+		entryPoint: ENTRYPOINT_ADDRESS_V07,
+		sender: senderAddress
+	})
+
 	const userOperation = {
 		sender: smartAccountAddress,
-		nonce: 0n,
+		nonce: nonce,
 		factory: factory,
 		factoryData,
 		callData,

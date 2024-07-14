@@ -3545,7 +3545,7 @@
     "@web3modal/wallet" "5.0.6"
     lit "3.1.0"
 
-"@web3modal/scaffold-utils@5.0.6":
+"@web3modal/scaffold-utils@5.0.6", "@web3modal/scaffold-utils@^5.0.6":
   version "5.0.6"
   resolved "https://registry.yarnpkg.com/@web3modal/scaffold-utils/-/scaffold-utils-5.0.6.tgz#7dd234a9f08b5e73afd21ef57cdd9087e08830b2"
   integrity sha512-/yNwlo/SlvY0Vi3kr/qoUCdhz978A7XlUqdcnk4mdEBFs0X0BzJbdfQ75xuKHXD+1ZU38HTV3lRH/XAbxbT5IA==
@@ -3561,7 +3561,7 @@
   dependencies:
     "@web3modal/scaffold" "5.0.6"
 
-"@web3modal/scaffold@5.0.6":
+"@web3modal/scaffold@5.0.6", "@web3modal/scaffold@^5.0.6":
   version "5.0.6"
   resolved "https://registry.yarnpkg.com/@web3modal/scaffold/-/scaffold-5.0.6.tgz#90367c53b2056fcafb8fdaa50f62bc5c4204b7ba"
   integrity sha512-KqcFJH5V8pMh4OHLV7dsTZTCNXUjsB7EKPEPpyq9bru60fiCz5PniS6nWRrZEmS7+BMNDr3cv/SVvg3+Rrvl+g==

@@ -24,7 +24,9 @@ import editIcon from '@/images/edit.svg';
 import ghostIcon from '@/images/ghost.svg';
 import useSmartAccountClient from '@/hooks/useSmartAccountClient';
 import { getBackups, getBackup } from '@/services/getBackups';
-import useUniversalAccountInfo from '@/hooks/useUniversalAccountInfo';
+
+import { useSafeInfoContextProvider } from "@/context/SafeInfoContextProvider";
+
 // import { wingmanModuleAddress, publicClient } from '@/services/consts';
 // import abi from '@/services/module.abi.json';
 
