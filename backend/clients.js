@@ -6,18 +6,18 @@ import { privateKeyToAccount } from "viem/accounts";
 
 const account = privateKeyToAccount(process.env.ACCOUNT_PK)
 
-const walletClient = createWalletClient({
+export const walletClient = createWalletClient({
     account,
     chain: sepolia,
     transport: http(process.env.RPC_UR),
 })
 
-const publicClient = createPublicClient({
+export const publicClient = createPublicClient({
     chain: sepolia,
     transport: http(process.env.RPC_UR),
 })
 
-const bundlerClient = createClient({
+export const bundlerClient = createClient({
     transport: http(process.env.ENDPOINT_URL),
     chain: sepolia,
 })
@@ -25,7 +25,7 @@ const bundlerClient = createClient({
     .extend(pimlicoBundlerActions(ENTRYPOINT_ADDRESS_V07))
 
 
-const paymasterClient = createClient({
+export const paymasterClient = createClient({
     transport: http(process.env.ENDPOINT_UR),
     chain: sepolia,
 }).extend(pimlicoPaymasterActions(ENTRYPOINT_ADDRESS_V07))

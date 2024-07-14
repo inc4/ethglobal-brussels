@@ -14,6 +14,9 @@ importers:
       cron:
         specifier: ^3.1.7
         version: 3.1.7
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       permissionless:
         specifier: ^0.1.39
         version: 0.1.39(viem@2.17.3)
@@ -63,6 +66,10 @@ packages:
 
   cron@3.1.7:
     resolution: {integrity: sha512-tlBg7ARsAMQLzgwqVxy8AZl/qlTc5nibqYwtNGoCrd+cV+ugI+tvZC1oT/8dFH8W455YrywGykx/KMmAqOr7Jw==}
+
+  dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
 
   isows@1.0.4:
     resolution: {integrity: sha512-hEzjY+x9u9hPmBom9IIAqdJCwNLax+xrPb51vEPpERoFlIxgmZcHzsT5jKG06nvInKOBGvReAVz80Umed5CczQ==}
@@ -133,6 +140,8 @@ snapshots:
     dependencies:
       '@types/luxon': 3.4.2
       luxon: 3.4.4
+
+  dotenv@16.4.5: {}
 
   isows@1.0.4(ws@8.17.1):
     dependencies:
