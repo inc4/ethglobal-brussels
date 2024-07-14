@@ -17,13 +17,13 @@ import {
 import { Tooltip } from '@nextui-org/tooltip';
 
 // TODO dele mocked data
-import { columns, users } from './data';
+import { columns } from './data';
 
 import deleteIcon from '@/images/delete.svg';
 import editIcon from '@/images/edit.svg';
 import ghostIcon from '@/images/ghost.svg';
 import useSmartAccountClient from '@/hooks/useSmartAccountClient';
-import { getBackups } from '@/services/getBackups';
+import { getBackups, getBackup } from '@/services/getBackups';
 import useUniversalAccountInfo from '@/hooks/useUniversalAccountInfo';
 // import { wingmanModuleAddress, publicClient } from '@/services/consts';
 // import abi from '@/services/module.abi.json';
@@ -35,6 +35,7 @@ import useUniversalAccountInfo from '@/hooks/useUniversalAccountInfo';
 
 // const moduleAddress = '0xbDa1dE70eAE1A18BbfdCaE95B42b5Ff6d3352492';
 // const ownerAddress = '0xED9586AD3a6A512ce5c2d0C6a5bf8972c00137e2';
+const ownerAddress = '0x90382784cFa7bE80Eb4107C0640e6D9195823B3B';
 
 // const getBackupsAbi = [
 //   {
@@ -91,11 +92,13 @@ export default function BackUpsPage() {
     useSmartAccountClient();
   const { address } = useUniversalAccountInfo();
   const [backupsList, setBackupsList] = useState([]);
+  const [detailedBackupsList, setDetailedBackupsList] = useState([]);
+  const [combinedBackups, setCombinedBackups] = useState([]);
 
   useEffect(() => {
     console.log('ADDRESS', address);
-    if (address) {
-      getBackups(address)
+    if (!address) {
+      getBackups(ownerAddress)
         .then((backups) => {
           setBackupsList(backups);
           console.log('Backups:', backups);
@@ -105,6 +108,39 @@ export default function BackUpsPage() {
         });
     }
   }, []);
+
+  useEffect(() => {
+    if (backupsList.length > 0) {
+      const fetchDetailedBackups = async () => {
+        try {
+          const detailedBackups = await Promise.all(
+            backupsList.map((backupName) =>
+              getBackup(ownerAddress, backupName),
+            ),
+          );
+
+          setDetailedBackupsList(detailedBackups);
+          console.log('Detailed Backups:', detailedBackups);
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+
+      fetchDetailedBackups();
+    }
+  }, [backupsList]);
+
+  useEffect(() => {
+    if (backupsList.length > 0 && detailedBackupsList.length > 0) {
+      const combined = backupsList.map((backupName, index) => ({
+        name: backupName,
+        ...detailedBackupsList[index],
+      }));
+
+      setCombinedBackups(combined);
+      console.log('Combined Backups:', combined);
+    }
+  }, [backupsList, detailedBackupsList]);
 
   const renderCell = useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
@@ -117,9 +153,11 @@ export default function BackUpsPage() {
           <div className="flex flex-col">
             <p className="font-semibold">Receiver</p>
             <div className="">
-              {Array.isArray(user.receiver)
-                ? user.receiver.map((item) => <p key={item}>{item}</p>)
-                : user.receiver}
+              {Array.isArray(user.beneficiaries)
+                ? user.beneficiaries.map((item) => (
+                    <p key={item.account}>{item.account}</p>
+                  ))
+                : user.beneficiaries}
             </div>
           </div>
         );
@@ -128,9 +166,11 @@ export default function BackUpsPage() {
           <div className="flex flex-col">
             <p className="font-semibold">Value</p>
             <div className="">
-              {Array.isArray(user.value)
-                ? user.value.map((item) => <p key={item}>{item}</p>)
-                : user.value}
+              {Array.isArray(user.beneficiaries)
+                ? user.beneficiaries.map((item) => (
+                    <p key={item.account}>{item.percentage}</p>
+                  ))
+                : user.beneficiaries}
             </div>
           </div>
         );
@@ -138,7 +178,7 @@ export default function BackUpsPage() {
         return (
           <div className="flex flex-col">
             <p className="font-semibold">Initiation Date</p>
-            <p className="">{user.value}</p>
+            <p className="">{user.unlockAt}</p>
           </div>
         );
       case 'actions':
@@ -175,8 +215,7 @@ export default function BackUpsPage() {
           Create Backup
         </Button>
       </div>
-      {/* //! Use backups.length for not mocked data */}
-      {!backupsList.length ? (
+      {backupsList.length ? (
         <Table
           fullWidth
           hideHeader
@@ -189,10 +228,10 @@ export default function BackUpsPage() {
               <TableColumn key={column.uid}>{column.name}</TableColumn>
             )}
           </TableHeader>
-          <TableBody items={users}>
+          <TableBody items={combinedBackups}>
             {(item) => (
               <TableRow
-                key={item.id}
+                key={item.name}
                 className=" border-b-[12px] border-transparent bg-white"
               >
                 {(columnKey) => (

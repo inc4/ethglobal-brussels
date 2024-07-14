@@ -36,5 +36,63 @@
         "internalType": "string[]"
       }
     ]
+  },
+  {
+    "type": "function",
+    "name": "getBackup",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct Wingman.Backup",
+        "components": [
+          {
+            "name": "createdAt",
+            "type": "uint48",
+            "internalType": "uint48"
+          },
+          {
+            "name": "unlockAt",
+            "type": "uint48",
+            "internalType": "uint48"
+          },
+          {
+            "name": "beneficiaries",
+            "type": "tuple[]",
+            "internalType": "struct Wingman.Beneficiary[]",
+            "components": [
+              {
+                "name": "account",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "percentage",
+                "type": "uint8",
+                "internalType": "uint8"
+              },
+              {
+                "name": "amount",
+                "type": "uint256",
+                "internalType": "uint256"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
   }
 ]
