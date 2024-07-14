@@ -28,7 +28,7 @@ export default function useUniversalAccountInfo(): UniversalAccountInfo {
         return;
       }
 
-      if (isConnectedToWc && walletInfo?.name === "Safe{Wallet}") {
+      if (isConnectedToWc) {
         setAccountInfo({
           connectedTo,
           address: wcAccount,
@@ -37,9 +37,9 @@ export default function useUniversalAccountInfo(): UniversalAccountInfo {
         return;
       }
 
-      setAccountInfo({
-        connectedTo
-      })
+      // setAccountInfo({
+      //   connectedTo
+      // })
 
     })()
   }, [sdk, isConnectedToSafe, safe, walletInfo, isConnectedToWc, wcAccount, wcChainId])

@@ -28,6 +28,8 @@
 		"@nextui-org/tooltip": "^2.0.36",
 		"@react-aria/ssr": "3.9.4",
 		"@react-aria/visually-hidden": "3.8.12",
+		"@rhinestone/module-sdk": "^0.1.7",
+		"@safe-global/api-kit": "^2.4.2",
 		"@safe-global/safe-apps-react-sdk": "^4.7.2",
 		"@safe-global/safe-apps-sdk": "^9.1.0",
 		"@safe-global/safe-apps-web3modal": "^23.0.0",

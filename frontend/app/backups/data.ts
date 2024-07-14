@@ -24,7 +24,7 @@ const users = [
   {
     id: 3,
     name: 'In case of a racetrack accident',
-    receiver: '00xa9....ab4d1',
+    receiver: '00aa9....ab4d1',
     value: '51,8.6 ETH',
     date: '17 Nov 2024',
   },

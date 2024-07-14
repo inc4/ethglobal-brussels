@@ -12,17 +12,17 @@ const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
-const chains = [arbitrum, sepolia] as const
+const chains = [sepolia] as const
 export const wagmiConfig = web3modalWagmiConfigWithSafe({
   chains,
   projectId,
   metadata,
-  enableEIP6963: false,
+  enableEIP6963: true,
   enableCoinbase: false,
   auth: {
     email: false
   },
-  enableInjected: false,
+  enableInjected: true,
   enableWalletConnect: true
 })
 

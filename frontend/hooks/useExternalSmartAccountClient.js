@@ -1,13 +1,10 @@
-'use client';
-
 import {useEffect, useState} from "react";
-
-import { useWalletClient } from 'wagmi';
+import {useWalletClient} from "wagmi";
+import {walletClientToSmartAccountSigner} from "permissionless";
 import {prepareSafeAccount, prepareSmartAccountClient} from "@/services/prepareSmartAccountClient";
 import {isWingmanModuleInitialized} from "@/services/installModule";
-import {walletClientToSmartAccountSigner} from "permissionless";
 
-export default function useSmartAccountClient() {
+export function useExternalSmartAccountClient(safeAccountAddress) {
 	const [client, setClient] = useState({
 		smartAccountClient: null,
 		isModuleSupported: false,
@@ -17,7 +14,7 @@ export default function useSmartAccountClient() {
 	const { data: walletClient } = useWalletClient();
 
 	useEffect(() => {
-		if (!walletClient) return;
+		if (!walletClient || !safeAccountAddress) return;
 
 		console.log('walletClient', walletClient);
 
@@ -26,7 +23,7 @@ export default function useSmartAccountClient() {
 
 			console.log('smartAccountSigner', smartAccountSigner);
 
-			const safeSmartAccount = await prepareSafeAccount(smartAccountSigner);
+			const safeSmartAccount = await prepareSafeAccount(smartAccountSigner, safeAccountAddress);
 
 			console.log('safeSmartAccount', safeSmartAccount)
 
@@ -51,7 +48,7 @@ export default function useSmartAccountClient() {
 			});
 		})()
 
-	}, [walletClient]);
+	}, [walletClient, safeAccountAddress]);
 
 	return client;
 }
