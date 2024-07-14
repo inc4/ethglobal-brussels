@@ -13,10 +13,10 @@ const ConnectSafeButton = () => {
         className="font-semibold"
         color="primary"
         size="lg"
-        startContent={<Image alt="SAFE logo" src={logoSafe} />}
+        // startContent={<Image alt="SAFE logo" src={logoSafe} />}
         onClick={() => open({ view: 'Connect' })}
       >
-        Connect Safe
+        Connect wallet
       </Button>
     </div>
   );

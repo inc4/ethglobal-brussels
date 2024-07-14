@@ -13,14 +13,18 @@ export interface ProvidersProps {
   themeProps?: ThemeProviderProps;
 }
 
+import { SafeInfoContextProvider } from "@/context/SafeInfoContextProvider";
+
 export function Providers({ children, themeProps }: ProvidersProps) {
   const router = useRouter();
 
   return (
     <Web3ModalProvider>
-      <NextUIProvider navigate={router.push}>
-        <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
-      </NextUIProvider>
+      <SafeInfoContextProvider>
+        <NextUIProvider navigate={router.push}>
+          <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+        </NextUIProvider>
+      </SafeInfoContextProvider>
     </Web3ModalProvider>
   );
 }

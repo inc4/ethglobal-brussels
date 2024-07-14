@@ -44,7 +44,7 @@ export async function installWingmanModule(smartAccountClient) {
     context: module.initData,
   });
 
-  const receipt = await pimlicoBundlerClient.waitForUserOperationReceipt({hash: opHash})
+  const receipt = await pimlicoBundlerClient.waitForUserOperationReceipt({hash: opHash, timeout: 100000})
 
   console.log(receipt);
   return receipt

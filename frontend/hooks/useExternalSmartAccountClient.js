@@ -1,54 +1,63 @@
-import {useEffect, useState} from "react";
-import {useWalletClient} from "wagmi";
-import {walletClientToSmartAccountSigner} from "permissionless";
-import {prepareSafeAccount, prepareSmartAccountClient} from "@/services/prepareSmartAccountClient";
-import {isWingmanModuleInitialized} from "@/services/installModule";
+import { useEffect, useState } from "react";
+import { useWalletClient } from "wagmi";
+import { walletClientToSmartAccountSigner } from "permissionless";
+
+import {
+  prepareSafeAccount,
+  prepareSmartAccountClient,
+} from "@/services/prepareSmartAccountClient";
+import { isWingmanModuleInitialized } from "@/services/installModule";
 
 export function useExternalSmartAccountClient(safeAccountAddress) {
-	const [client, setClient] = useState({
-		smartAccountClient: null,
-		isModuleSupported: false,
-		isWingmanDeployed: false
-	});
+  const [client, setClient] = useState({
+    smartAccountClient: null,
+    isModuleSupported: false,
+    isWingmanDeployed: false,
+  });
 
-	const { data: walletClient } = useWalletClient();
+  const { data: walletClient } = useWalletClient();
 
-	useEffect(() => {
-		if (!walletClient || !safeAccountAddress) return;
+  useEffect(() => {
+    if (!walletClient || !safeAccountAddress) return;
 
-		console.log('walletClient', walletClient);
+    console.log("walletClient", walletClient);
 
-		(async () => {
-			const smartAccountSigner = await walletClientToSmartAccountSigner(walletClient);
+    (async () => {
+      const smartAccountSigner =
+        await walletClientToSmartAccountSigner(walletClient);
 
-			console.log('smartAccountSigner', smartAccountSigner);
+      console.log("smartAccountSigner", smartAccountSigner);
 
-			const safeSmartAccount = await prepareSafeAccount(smartAccountSigner, safeAccountAddress);
+      const safeSmartAccount = await prepareSafeAccount(
+        smartAccountSigner,
+        safeAccountAddress,
+      );
 
-			console.log('safeSmartAccount', safeSmartAccount)
+      console.log("safeSmartAccount", safeSmartAccount);
 
-			const smartAccountClient = await prepareSmartAccountClient(safeSmartAccount);
+      const smartAccountClient =
+        await prepareSmartAccountClient(safeSmartAccount);
 
-			console.log('smartAccountClient', smartAccountClient);
+      console.log("smartAccountClient", smartAccountClient);
 
-			const isModuleSupported = await smartAccountClient.supportsModule({
-				type: "fallback"
-			});
+      const isModuleSupported = await smartAccountClient.supportsModule({
+        type: "fallback",
+      });
 
-			console.log('isModuleSupported', isModuleSupported)
+      console.log("isModuleSupported", isModuleSupported);
 
-			const isWingmanDeployed = await isWingmanModuleInitialized(smartAccountClient);
+      const isWingmanDeployed =
+        await isWingmanModuleInitialized(smartAccountClient);
 
-			console.log('isWingmanDeployed', isWingmanDeployed);
+      console.log("isWingmanDeployed", isWingmanDeployed);
 
-			setClient({
-				smartAccountClient,
-				isModuleSupported,
-				isWingmanDeployed
-			});
-		})()
+      setClient({
+        smartAccountClient,
+        isModuleSupported,
+        isWingmanDeployed,
+      });
+    })();
+  }, [walletClient, safeAccountAddress]);
 
-	}, [walletClient, safeAccountAddress]);
-
-	return client;
+  return client;
 }
