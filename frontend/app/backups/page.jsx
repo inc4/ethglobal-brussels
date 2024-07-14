@@ -35,7 +35,7 @@ import useUniversalAccountInfo from '@/hooks/useUniversalAccountInfo';
 
 // const moduleAddress = '0xbDa1dE70eAE1A18BbfdCaE95B42b5Ff6d3352492';
 // const ownerAddress = '0xED9586AD3a6A512ce5c2d0C6a5bf8972c00137e2';
-const ownerAddress = '0x90382784cFa7bE80Eb4107C0640e6D9195823B3B';
+// const ownerAddress = '0x90382784cFa7bE80Eb4107C0640e6D9195823B3B';
 
 // const getBackupsAbi = [
 //   {
@@ -85,20 +85,24 @@ const ownerAddress = '0x90382784cFa7bE80Eb4107C0640e6D9195823B3B';
 //     console.error('Error:', error);
 //   });
 
+import { useRouter } from 'next/navigation'
+
 console.log('render');
 
 export default function BackUpsPage() {
   const { isModuleSupported, isWingmanDeployed, smartAccountClient } =
     useSmartAccountClient();
-  const { address } = useUniversalAccountInfo();
+  // const { address } = useUniversalAccountInfo();
   const [backupsList, setBackupsList] = useState([]);
   const [detailedBackupsList, setDetailedBackupsList] = useState([]);
   const [combinedBackups, setCombinedBackups] = useState([]);
 
+  const { setSafeInfo, safeInfo } = useSafeInfoContextProvider();
+
   useEffect(() => {
-    console.log('ADDRESS', address);
-    if (!address) {
-      getBackups(ownerAddress)
+    console.log('ADDRESS', safeInfo.address);
+    if (!safeInfo.address) {
+      getBackups(safeInfo.address)
         .then((backups) => {
           setBackupsList(backups);
           console.log('Backups:', backups);
@@ -115,7 +119,7 @@ export default function BackUpsPage() {
         try {
           const detailedBackups = await Promise.all(
             backupsList.map((backupName) =>
-              getBackup(ownerAddress, backupName),
+              getBackup(safeInfo.address, backupName),
             ),
           );
 
@@ -168,7 +172,7 @@ export default function BackUpsPage() {
             <div className="">
               {Array.isArray(user.beneficiaries)
                 ? user.beneficiaries.map((item) => (
-                    <p key={item.account}>{item.percentage}</p>
+                    <p key={item.account}>{item.percentage}%</p>
                   ))
                 : user.beneficiaries}
             </div>
@@ -201,16 +205,17 @@ export default function BackUpsPage() {
     }
   }, []);
 
+  const router = useRouter();
+
   return (
     <div>
       <div className="flex justify-between pb-8">
         <h1 className=" content-center text-lg font-semibold">Your Backups</h1>
         <Button
-          as={Link}
           className="font-semibold"
           color="primary"
-          href={'/create'}
           size="lg"
+          onClick={() => router.push('/create')}
         >
           Create Backup
         </Button>

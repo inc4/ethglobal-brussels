@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useContext, useEffect } from "react";
 import { useWalletClient } from "wagmi";
 import { walletClientToSmartAccountSigner } from "permissionless";
@@ -27,6 +29,10 @@ export function SafeInfoContextProvider({ children }) {
   const { connectedTo, address } = useUniversalAccountInfo();
 
   const { data: walletClient } = useWalletClient();
+
+  useEffect(() => {
+    console.log('safe info', safeInfo);
+  }, [safeInfo])
 
   useEffect(() => {
     if (!walletClient) return;

@@ -13,7 +13,7 @@ export default function AccountRadioGroup({ safes, onChange }) {
             className=" py-2 bg-primary-200"
             isDisabled={!isCompatible}
             size="md w-full"
-            onClick={onChange}
+            onClick={() => onChange(safe.address)}
           >
             <span className="flex flex-col text-left py-8">
               <span>{safe.address}</span>

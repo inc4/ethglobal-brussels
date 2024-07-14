@@ -21,6 +21,8 @@ import {
   prepareSmartAccountClient,
 } from "@/services/prepareSmartAccountClient";
 
+import { useRouter } from 'next/navigation'
+
 export default function Home() {
   const { connectedTo, address } = useUniversalAccountInfo();
 
@@ -225,6 +227,7 @@ function StageThree() {
 }
 
 function StageFour() {
+  const router = useRouter()
   return (
     <>
       {/* eslint-disable-next-line react/no-unescaped-entities */}
@@ -232,10 +235,9 @@ function StageFour() {
 
       <Button
         showAnchorIcon
-        as={Link}
         color="primary"
-        href={"/backup"}
         variant="solid"
+        onClick={() => router.push('/backups')}
       >
         Go to dashboard
       </Button>
